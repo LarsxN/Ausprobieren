@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>WG Sauberkeit — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fbfbfb;
+    --text: #0f1724;
+    --muted: #6b7280;
+    --shadow: 0 8px 24px rgba(0,0,0,0.06);
+    --radius: 14px;
+    --color-sharaf: #FF6B6B; /* Red */
+    --color-mark: #eb45f0;   /* Teal */
+    --color-toan: #FFD93D;   /* Yellow */
+    --color-simone: #6A4C93; /* Purple */
+  }
+  * { box-sizing: border-box; font-family: "Inter", sans-serif; }
+  body {
+    margin: 0;
+    background: #f6f7f8;
+    color: var(--text);
+  }
+  .wrap {
+    max-width: 980px;
+    margin: 20px auto;
+    padding: 20px;
+  }
+  header {
+    text-align: center; /* Center the title and controls */
+    margin-bottom: 30px; /* More space below header */
+  }
+  .title {
+    font-size: 32px; /* Bigger title */
+    font-weight: 700;
+    margin-bottom: 20px; /* Space between title and controls */
+    display: flex; /* Allow icon and text to align */
+    justify-content: center; /* Center content */
+    align-items: center;
+    gap: 10px; /* Space between icon and text */
+  }
+  .title span {
+      font-size: 38px; /* Larger calendar icon */
+  }
+  .controls {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center control buttons */
+    gap: 10px; /* Space between buttons */
+  }
+  .btn {
+    border: none;
+    background: white;
+    box-shadow: var(--shadow);
+    border-radius: 10px;
+    padding: 10px 18px; /* Slightly larger buttons */
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--text);
+    transition: background-color .2s, transform .1s;
+  }
+  .btn:hover:not(:disabled) { /* Apply hover only if not disabled */
+    background-color: #f0f0f0;
+    transform: translateY(-1px); /* Slight lift on hover */
+  }
+  .btn:active:not(:disabled) { /* Apply active only if not disabled */
+      transform: translateY(0);
+  }
+  .btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4x1 for desktop */
+    gap: 20px;
+  }
+
+  /* Responsive for mobile: 2x2 */
+  @media (max-width: 768px) {
+    .grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .title {
+        font-size: 28px;
+    }
+    .title span {
+        font-size: 34px;
+    }
+  }
+
+  /* Responsive for even smaller screens, maybe 1x4 if cards get too small */
+  @media (max-width: 480px) {
+    .grid {
+      grid-template-columns: 1fr; /* Stack vertically on very small screens */
+    }
+    .controls {
+        flex-direction: column; /* Stack buttons vertically */
+        gap: 15px;
+    }
+    .btn {
+        width: 100%; /* Make buttons full width */
+    }
+  }
+
+  .card {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 20px; /* Slightly more padding */
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: center;
+    transition: transform .2s, box-shadow .2s;
+    border-bottom: 5px solid transparent; /* Added for color highlight */
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+  }
+  /* Color borders for each card */
+  .sharaf { border-bottom-color: var(--color-sharaf); }
+  .mark { border-bottom-color: var(--color-mark); }
+  .toan { border-bottom-color: var(--color-toan); }
+  .simone { border-bottom-color: var(--color-simone); }
+
+  .person {
+    font-weight: 700;
+    font-size: 20px; /* Slightly larger person name */
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+  .icon-circle {
+    width: 65px; /* Bigger icon circle */
+    height: 65px; /* Bigger icon circle */
+    border-radius: 50%; /* Make it circular */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px; /* Bigger icon inside */
+    color: white;
+    flex-shrink: 0;
+    margin: 0 auto 15px auto; /* More space below icon */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Shadow for icons */
+  }
+  /* Specific icon colors */
+  .sharaf .icon-circle { background: var(--color-sharaf); }
+  .mark .icon-circle { background: var(--color-mark); color: #073b3a; }
+  .toan .icon-circle { background: var(--color-toan); color: #222; }
+  .simone .icon-circle { background: var(--color-simone); }
+
+  .task-name {
+    font-weight: 600;
+    font-size: 18px; /* Slightly larger task name */
+    margin-bottom: 5px;
+    color: var(--text);
+  }
+  .task-sub {
+    color: var(--muted);
+    font-size: 15px;
+    margin-bottom: 10px; /* Space before date range */
+  }
+  .done-btn {
+    border: none;
+    border-radius: 10px;
+    padding: 10px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all .2s;
+    background: #e8eef3;
+    color: #333;
+    margin-top: auto; /* Push button to bottom */
+    width: 100%;
+  }
+  .done-btn.done {
+    background: #4CAF50;
+    color: white;
+    box-shadow: 0 0 10px rgba(76,175,80,0.4);
+  }
+  .date-range {
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 15px; /* More space before button */
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="title"><span>📅</span> WG Sauberkeit Plan</div>
+      <div class="controls">
+        <button class="btn" id="prevBtn">‹ Vorherige Woche</button>
+        <button class="btn" id="thisWeekBtn">Diese Woche</button>
+        <!-- Added "Nächste Woche" back so you can navigate forward after "Vorherige Woche" -->
+        <button class="btn" id="nextBtn">Nächste Woche ›</button>
+      </div>
+    </header>
+
+    <div class="grid" id="cardsGrid">
+      <!-- Cards will be rendered here by JavaScript -->
+    </div>
+  </div>
+
+<script>
+const people = [
+{key:'lars', name:'Lars'},
+{key:'joline', name:'Joline'}
+];
+const tasks = [
+  {name:'Küche', icon:'🧹'},
+  {name:'Bad', icon:'🪣'},
+  {name:'Müll', icon:'🗑️'},
+  {name:'Flur + Balkon', icon:'🪟'}
+];
+const startDate = new Date(Date.UTC(2025,9,10)); // 10 Oct 2025 (Month 9 is October)
+let weekIndex = 0; // Start at 0 for "Diese Woche"
+
+function addDays(d, days){
+  const c = new Date(d);
+  c.setUTCDate(c.getUTCDate()+days);
+  return c;
+}
+
+function formatRange(idx){
+  const s = addDays(startDate, idx*7);
+  const e = addDays(s, 2); // Friday to Sunday is 3 days, so +2 from Friday gives Sunday
+  const monthNames = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
+  return `${s.getUTCDate()}–${e.getUTCDate()} ${monthNames[s.getUTCMonth()]}`;
+}
+
+function render(){
+  const grid=document.getElementById("cardsGrid");
+  grid.innerHTML=''; // Clear existing cards
+
+  const orderedPeopleKeys = ['joline', 'lars'];
+  const orderedPeople = orderedPeopleKeys.map(key => people.find(p => p.key === key));
+
+  orderedPeople.forEach((p)=>{
+    const originalPersonIndex = people.findIndex(origP => origP.key === p.key);
+    const task = tasks[(originalPersonIndex + weekIndex) % tasks.length];
+
+    const card=document.createElement('div');
+    card.className=`card ${p.key}`;
+    const doneKey=`done_${weekIndex}_${p.key}`;
+    const done=localStorage.getItem(doneKey)==='1';
+    card.innerHTML=`
+      <div class="icon-circle">${task.icon}</div>
+      <div class="person">${p.name}</div>
+      <div class="task-name">${task.name}</div>
+      <div class="task-sub">Freitag – Sonntag</div>
+      <div class="date-range">${formatRange(weekIndex)}</div>
+      <button class="done-btn ${done?'done':''}">${done?'✅ Erledigt':'Als erledigt markieren'}</button>
+    `;
+    const btn=card.querySelector('.done-btn');
+    btn.addEventListener('click',()=>{
+      const newState=!btn.classList.contains('done');
+      btn.classList.toggle('done',newState);
+      btn.innerText=newState?'✅ Erledigt':'Als erledigt markieren';
+      if(newState) localStorage.setItem(doneKey,'1');
+      else localStorage.removeItem(doneKey);
+    });
+    grid.appendChild(card);
+  });
+
+  // Update button states
+  document.getElementById('prevBtn').disabled = (weekIndex === 0);
+  document.getElementById('nextBtn').disabled = false; // Next week is always available unless you define an end
+
+  const thisWeekBtn = document.getElementById('thisWeekBtn');
+  if (weekIndex === 0) {
+      thisWeekBtn.classList.add('done');
+      thisWeekBtn.textContent = '✅ Diese Woche';
+  } else {
+      thisWeekBtn.classList.remove('done');
+      thisWeekBtn.textContent = 'Diese Woche';
+  }
+}
+
+document.getElementById('prevBtn').onclick=()=>{
+  if(weekIndex > 0){
+    weekIndex--;
+    render();
+  }
+};
+
+document.getElementById('nextBtn').onclick=()=>{
+  weekIndex++; // Allow navigating forward
+  render();
+};
+
+document.getElementById('thisWeekBtn').onclick=()=>{
+  weekIndex = 0; // Go back to the initial week
+  render();
+};
+
+render(); // Initial render on page load
+</script>
+</body>
+</html>
